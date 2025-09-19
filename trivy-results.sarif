@@ -9,14 +9,14 @@
           "informationUri": "https://github.com/aquasecurity/trivy",
           "name": "Trivy",
           "rules": [],
-          "version": "0.66.0"
+          "version": "0.65.0"
         }
       },
       "results": [],
       "columnKind": "utf16CodeUnits",
       "originalUriBaseIds": {
         "ROOTPATH": {
-          "uri": "file:///home/runner/work/micro-serice-app/micro-serice-app/Dockerfile/"
+          "uri": "file:///home/runner/work/nodejs-app/nodejs-app/Dockerfile/"
         }
       }
     }
