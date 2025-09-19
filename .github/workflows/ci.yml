@@ -1,0 +1,133 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, 'feature/**' ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  security-events: write
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python & install Semgrep
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install semgrep
+    
+    - name: Run Semgrep
+      run: semgrep --config auto --json > semgrep-results.json
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'config'
+        scan-ref: 'Dockerfile'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy results
+      uses: actions/upload-artifact@v4
+      with:
+        name: trivy-results
+        path: trivy-results.sarif
+
+    - name: Build Docker image
+      run: docker build -t secure-microservice .
+
+    - name: Scan Docker image with Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        version: latest
+        image-ref: secure-microservice
+        format: json
+        output: trivy-image-results.json
+        exit-code: 1
+        severity: CRITICAL
+        ignore-unfixed: true
+
+    - name: Upload Trivy image results
+      uses: actions/upload-artifact@v4
+      with:
+        name: trivy-image-results
+        path: trivy-image-results.json
+
+    - name: Commit scan results
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git status
+        ls -la *.json *.sarif
+        git add semgrep-results.json trivy-results.sarif trivy-image-results.json || echo "Some files may not exist yet"
+        git status
+        git diff --cached
+        git commit -m "Add security scan results" || echo "No changes to commit"
+        git push origin main || echo "Push failed, but results are saved locally"
+
+
+    - name: Fail on critical issues
+      if: failure()
+      run: echo "Security scan failed. Fix critical issues before proceeding."
+
+  deploy:
+    needs: security-scan
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Terraform Init
+      run: |
+        cd terraform
+        terraform init
+
+    - name: Terraform Plan
+      run: |
+        cd terraform
+        terraform plan -var="mongodb_uri=${{ secrets.MONGODB_URI }}"
+
+    - name: Terraform Apply
+      run: |
+        cd terraform
+        terraform apply -auto-approve -var="mongodb_uri=${{ secrets.MONGODB_URI }}"
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build Docker Image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: node-js-app-repository
+      run: |
+        # Build the Docker image
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+
+    - name: Push Docker Image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: node-js-app-repository
+      run: |
+        # Push the Docker image
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Update ECS Service
+      run: |
+        aws ecs update-service --cluster node-js-app-cluster --service node-js-app-service --force-new-deployment
