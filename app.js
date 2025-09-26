@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const csurf = require('csurf');
-const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager');
+const { SSMClient, GetParameterCommand } = require('@aws-sdk/client-ssm');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -10,29 +10,22 @@ const port = process.env.PORT || 3000;
 const secretName = process.env.MONGODB_SECRET_NAME || 'prod/mongodb_uri';
 const region = process.env.AWS_REGION || 'us-east-1';
 
-const client = new SecretsManagerClient({ region });
+const client = new SSMClient({ region });
 
 async function getSecretValue(secretName) {
   try {
-    const command = new GetSecretValueCommand({ SecretId: secretName });
+    const command = new GetParameterCommand({ Name: secretName, WithDecryption: true });
     const data = await client.send(command);
-    if ('SecretString' in data) {
-      return data.SecretString;
-    } else {
-      const buff = Buffer.from(data.SecretBinary, 'base64');
-      return buff.toString('ascii');
-    }
+    return data.Parameter.Value;
   } catch (err) {
-    console.error('Error retrieving secret:', err);
+    console.error('Error retrieving parameter:', err);
     throw err;
   }
 }
 
 async function startServer() {
   try {
-    const secretString = await getSecretValue(secretName);
-    const secret = JSON.parse(secretString);
-    const mongoUri = secret.MONGODB_URI || secret.mongoUri || secret.uri || secret.connectionString;
+    const mongoUri = await getSecretValue(secretName);
 
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,

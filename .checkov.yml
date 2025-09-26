@@ -1,0 +1,12 @@
+# Checkov configuration for Terraform security scanning
+
+checks:
+  terraform:
+    skip_checks:
+      - CKV_AWS_21  # Example: Skip if needed for specific resources
+      - CKV_AWS_23  # Adjust based on project needs
+
+framework: terraform
+
+# Run checks on the terraform directory
+directory: terraform/

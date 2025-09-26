@@ -13,7 +13,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "mongoose": "^7.5.0",
-    "@aws-sdk/client-secrets-manager": "^3.379.0"
+    "@aws-sdk/client-ssm": "^3.379.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
@@ -24,6 +24,5 @@
     "mongodb",
     "security"
   ],
-  "author": "BlackBoxAI",
   "license": "MIT"
 }

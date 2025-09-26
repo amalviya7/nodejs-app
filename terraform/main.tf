@@ -5,15 +5,21 @@ terraform {
       version = "~> 5.0"
     }
   }
+
+  backend "s3" {
+    bucket = "my-terraform-state-bucket"
+    key    = "terraform/state"
+    region = "us-east-1"
+  }
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region = var.region
 }
 
 # VPC
 resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block = var.vpc_cidr
   tags = {
     Name = "node-js-app-vpc"
   }
@@ -21,9 +27,9 @@ resource "aws_vpc" "main" {
 
 # Subnets
 resource "aws_subnet" "public" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.public_subnet_cidr
+  availability_zone = var.availability_zone
   tags = {
     Name = "node-js-app-public-subnet"
   }
@@ -59,16 +65,11 @@ resource "aws_ecr_repository" "app" {
   name = "node-js-app-repository"
 }
 
-# Secrets Manager
-resource "aws_secretsmanager_secret" "mongodb_uri" {
-  name = "mongodb_uri"
-}
-
-resource "aws_secretsmanager_secret_version" "mongodb_uri" {
-  secret_id = aws_secretsmanager_secret.mongodb_uri.id
-  secret_string = jsonencode({
-    MONGODB_URI = var.mongodb_uri
-  })
+# SSM Parameter
+resource "aws_ssm_parameter" "mongodb_uri" {
+  name  = "/mongodb_uri"
+  type  = "SecureString"
+  value = var.mongodb_uri
 }
 
 # ECS Task Definition
@@ -94,18 +95,18 @@ resource "aws_ecs_task_definition" "app" {
       environment = [
         {
           name  = "MONGODB_SECRET_NAME"
-          value = "mongodb_uri"
+          value = "/mongodb_uri"
         },
         {
           name  = "AWS_REGION"
-          value = "us-east-1"
+          value = var.region
         }
       ]
       logConfiguration = {
         logDriver = "awslogs"
         options = {
           "awslogs-group"         = "/ecs/node-js-app"
-          "awslogs-region"        = "us-east-1"
+          "awslogs-region"        = var.region
           "awslogs-stream-prefix" = "ecs"
         }
       }
@@ -182,11 +183,4 @@ resource "aws_kms_key" "cloudwatch_key" {
   description             = "KMS key for CloudWatch log group encryption"
   deletion_window_in_days = 10
   enable_key_rotation     = true
-}
-
-# Variables
-variable "mongodb_uri" {
-  description = "MongoDB connection URI"
-  type        = string
-  sensitive   = true
 }
