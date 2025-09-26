@@ -1,31 +1,31 @@
 {
   "SchemaVersion": 2,
-  "CreatedAt": "2025-09-19T15:48:21.568463577Z",
+  "CreatedAt": "2025-09-26T12:50:25.437812744Z",
   "ArtifactName": "secure-microservice",
   "ArtifactType": "container_image",
   "Metadata": {
-    "Size": 156738048,
+    "Size": 928262144,
     "OS": {
       "Family": "alpine",
       "Name": "3.21.3"
     },
-    "ImageID": "sha256:c4403317fc04b4558fe4b5e43142620307bcd3eecdba5bffb692ee3cfeac5106",
+    "ImageID": "sha256:8d1107de2fb06a7e07eec19ebcf70d6475c30dfd78cb41816145cdd8856be5e9",
     "DiffIDs": [
       "sha256:08000c18d16dadf9553d747a58cf44023423a9ab010aab96cf263d2216b8b350",
       "sha256:0b1f26057bd0491a50f56fd7f2983bd3ad478511f12fff2b361a97c50cb5828b",
       "sha256:f3b40b0cdb1caad1db11b8589c814f85b3e69f3ed33f64a686e465e74a47c9f0",
       "sha256:82140d9a70a706b719632fec8e4d083419fc62159f94afec80dcabc52e0ed0d2",
-      "sha256:d1c58a2f115a6fb4984d9997c6a023744c68377adf02cece006254bae5bff9d2",
-      "sha256:6760d5f9fe06b2310de5fb50896b9b32e33b62cf4561256896bfad1c7845543b",
-      "sha256:862d95db1b359f67dd11574c45e0190008fd2344353be8cd5899952c8ea02684",
-      "sha256:439866621981602e2e22cdfef7210399f209d51853ff4f029ee7be9854a8346b"
+      "sha256:f64c0200b404fa9ed233900a7365f19083ad6c441d56a34d120afc4b7eb4fc0a",
+      "sha256:5fa872046e65e26ac6fb191bd9a39baa453613d341b3938db8b32fddabc432d1",
+      "sha256:35e2feecff4848df5dcf061b4cb0788d9c9d0c3af9034d90aeea839a0f5a4662",
+      "sha256:4c8f3dbd432ff8b8b223733636cee11d3db05decd4b18538aa9352e93faa0e0d"
     ],
     "RepoTags": [
       "secure-microservice:latest"
     ],
     "ImageConfig": {
       "architecture": "amd64",
-      "created": "2025-09-19T15:48:08.958560057Z",
+      "created": "2025-09-26T12:50:03.527073309Z",
       "history": [
         {
           "created": "2025-02-14T03:28:36Z",
@@ -78,45 +78,45 @@
           "empty_layer": true
         },
         {
-          "created": "2025-09-19T15:48:04Z",
+          "created": "2025-09-26T12:49:57Z",
           "created_by": "RUN /bin/sh -c addgroup -g 1001 -S nodejs \u0026\u0026     adduser -S app-user -u 1001 # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2025-09-19T15:48:04Z",
+          "created": "2025-09-26T12:49:57Z",
           "created_by": "WORKDIR /app",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2025-09-19T15:48:08Z",
+          "created": "2025-09-26T12:50:01Z",
           "created_by": "COPY --chown=app-user:nodejs /app/node_modules ./node_modules # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2025-09-19T15:48:08Z",
+          "created": "2025-09-26T12:50:03Z",
           "created_by": "COPY --chown=app-user:nodejs . . # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2025-09-19T15:48:08Z",
+          "created": "2025-09-26T12:50:03Z",
           "created_by": "USER app-user",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2025-09-19T15:48:08Z",
+          "created": "2025-09-26T12:50:03Z",
           "created_by": "EXPOSE map[3000/tcp:{}]",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2025-09-19T15:48:08Z",
+          "created": "2025-09-26T12:50:03Z",
           "created_by": "HEALTHCHECK \u0026{[\"CMD-SHELL\" \"node healthcheck.js\"] \"30s\" \"3s\" \"5s\" \"0s\" '\\x03'}",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2025-09-19T15:48:08Z",
+          "created": "2025-09-26T12:50:03Z",
           "created_by": "CMD [\"node\" \"app.js\"]",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
@@ -130,10 +130,10 @@
           "sha256:0b1f26057bd0491a50f56fd7f2983bd3ad478511f12fff2b361a97c50cb5828b",
           "sha256:f3b40b0cdb1caad1db11b8589c814f85b3e69f3ed33f64a686e465e74a47c9f0",
           "sha256:82140d9a70a706b719632fec8e4d083419fc62159f94afec80dcabc52e0ed0d2",
-          "sha256:d1c58a2f115a6fb4984d9997c6a023744c68377adf02cece006254bae5bff9d2",
-          "sha256:6760d5f9fe06b2310de5fb50896b9b32e33b62cf4561256896bfad1c7845543b",
-          "sha256:862d95db1b359f67dd11574c45e0190008fd2344353be8cd5899952c8ea02684",
-          "sha256:439866621981602e2e22cdfef7210399f209d51853ff4f029ee7be9854a8346b"
+          "sha256:f64c0200b404fa9ed233900a7365f19083ad6c441d56a34d120afc4b7eb4fc0a",
+          "sha256:5fa872046e65e26ac6fb191bd9a39baa453613d341b3938db8b32fddabc432d1",
+          "sha256:35e2feecff4848df5dcf061b4cb0788d9c9d0c3af9034d90aeea839a0f5a4662",
+          "sha256:4c8f3dbd432ff8b8b223733636cee11d3db05decd4b18538aa9352e93faa0e0d"
         ]
       },
       "config": {
@@ -186,19 +186,19 @@
       },
       {
         "Size": 10752,
-        "DiffID": "sha256:d1c58a2f115a6fb4984d9997c6a023744c68377adf02cece006254bae5bff9d2"
+        "DiffID": "sha256:f64c0200b404fa9ed233900a7365f19083ad6c441d56a34d120afc4b7eb4fc0a"
       },
       {
         "Size": 1536,
-        "DiffID": "sha256:6760d5f9fe06b2310de5fb50896b9b32e33b62cf4561256896bfad1c7845543b"
+        "DiffID": "sha256:5fa872046e65e26ac6fb191bd9a39baa453613d341b3938db8b32fddabc432d1"
       },
       {
-        "Size": 25372160,
-        "DiffID": "sha256:862d95db1b359f67dd11574c45e0190008fd2344353be8cd5899952c8ea02684"
+        "Size": 28997632,
+        "DiffID": "sha256:35e2feecff4848df5dcf061b4cb0788d9c9d0c3af9034d90aeea839a0f5a4662"
       },
       {
-        "Size": 1924096,
-        "DiffID": "sha256:439866621981602e2e22cdfef7210399f209d51853ff4f029ee7be9854a8346b"
+        "Size": 769822720,
+        "DiffID": "sha256:4c8f3dbd432ff8b8b223733636cee11d3db05decd4b18538aa9352e93faa0e0d"
       }
     ]
   },
